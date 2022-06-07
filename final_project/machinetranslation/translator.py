@@ -1,10 +1,23 @@
-from machinetranslation import translator
-from flask import Flask, render_template, request
+""" This module translates words from English to French.
+And French to English """
 import json
+import os
+from ibm_watson import LanguageTranslatorV3
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from dotenv import load_dotenv
 
-app = Flask("Web Translator")
+load_dotenv()
 
-@app.route("/english_to_french")
+apikey = os.environ['apikey']
+url = os.environ['url']
+
+authenticator = IAMAuthenticator(apikey)
+language_translator = LanguageTranslatorV3(
+    version='2018-05-01',
+    authenticator=authenticator)
+
+language_translator.set_service_url(url)
+
 def english_to_french(english_text):
     """
     This program translates english words to french.
@@ -15,7 +28,6 @@ def english_to_french(english_text):
     french_translation = french_text['translations'][0]['translation']
     return french_translation
 
-@app.route("/french_to_english")
 def french_to_english(french_text):
     """
     This program translates french words to english.
@@ -25,10 +37,3 @@ def french_to_english(french_text):
         model_id='fr-en').get_result()
     english_translation = english_text['translations'][0]['translation']
     return english_translation
-
-@app.route("/index.html")
-def renderIndexPage():
-    # Write the code to render template
-
-if __name__=="__main__":
-    app.run(host="0.0.0.0", port=8080)
